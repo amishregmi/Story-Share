@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "538099435868",
+    "firebase_url": "https://story-share-40c48.firebaseio.com",
+    "project_id": "story-share-40c48",
+    "storage_bucket": "story-share-40c48.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538099435868:android:42f056deecde9c10269999",
+        "android_client_info": {
+          "package_name": "aregmi.ramapo.edu.storyshare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "538099435868-3fb33mmgqepj6gauk8i8dck0fibi4l2e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaw4saJpxdbqs_e1ouwEalKRqsBcuXmr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "538099435868-3fb33mmgqepj6gauk8i8dck0fibi4l2e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
