@@ -85,18 +85,22 @@ public class ProfileFragment extends Fragment implements View.OnClickListener{
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.logout_button:
-                String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                System.out.println("LOGOUT BUTTON CLICKED");
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 startActivity(intent);
+                break;
 
             case R.id.button_save_profile:
+                System.out.println("INSIDE CASE SAVE PROFILE BUTTON");
                 saveUserDetails();
+                break;
 
         }
     }
 
     private void saveUserDetails() {
+        System.out.println("INSIDE SAVEDETAILS FUNCTION");
         String user_name_extract = user_name.getText().toString();
         String user_description_extract = user_description.getText().toString();
 
