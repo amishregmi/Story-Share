@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -34,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -43,6 +45,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,21 +57,54 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private View current;
     private TextView summary_textview;
     private TextView textview_summary_tag;
+    private TextView extracted_emotions_textview;
+    private TextView emotions_textview;
+    private TextView categories_extracted_textview;
+    private Button save_button;
+    private List<String> categories_extracted_arraylist;
+    private String story_key;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
+        story_key = "";
         current = inflater.inflate(R.layout.fragment_home, container, false);
         Button upload_button = current.findViewById(R.id.upload_button);
         summary_textview = current.findViewById(R.id.summary_textview);
-        summary_textview.setVisibility(View.INVISIBLE);
         textview_summary_tag = current.findViewById(R.id.textview_summary_tag);
-        textview_summary_tag.setVisibility(View.INVISIBLE);
+        extracted_emotions_textview = current.findViewById(R.id.extracted_emotions_textview);
+        emotions_textview = current.findViewById(R.id.emotions_textview);
+        categories_extracted_textview = current.findViewById(R.id.categories_extracted_textview);
+        save_button = current.findViewById(R.id.save_button);
+        //categories_extracted_arraylist.clear();
+
+        turnVisibilityOff();
 
         upload_button.setOnClickListener(this);
+        save_button.setOnClickListener(this);
 
         return current;
+    }
+
+    private void turnVisibilityOff() {
+        summary_textview.setVisibility(View.INVISIBLE);
+        textview_summary_tag.setVisibility(View.INVISIBLE);
+        extracted_emotions_textview.setVisibility(View.INVISIBLE);
+        emotions_textview.setVisibility(View.INVISIBLE);
+        categories_extracted_textview.setVisibility(View.INVISIBLE);
+        save_button.setVisibility(View.INVISIBLE);
+    }
+
+    private void turnVisibilityOn(){
+        summary_textview.setVisibility(View.VISIBLE);
+        textview_summary_tag.setVisibility(View.VISIBLE);
+        extracted_emotions_textview.setVisibility(View.VISIBLE);
+        emotions_textview.setVisibility(View.VISIBLE);
+        categories_extracted_textview.setVisibility(View.VISIBLE);
+        summary_textview.setMovementMethod(new ScrollingMovementMethod());
+        emotions_textview.setMovementMethod(new ScrollingMovementMethod());
+        save_button.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -77,7 +113,24 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         switch (v.getId()){
             case R.id.upload_button:
                 uploadFile();
+                break;
+
+            case R.id.save_button:
+                saveToExtractedCategories();
+                break;
         }
+
+    }
+
+    private void saveToExtractedCategories() {
+        System.out.println("Inside saveToExtractedCategories Function");
+        for (String one_category : categories_extracted_arraylist){
+            //DatabaseReference user_db_reference = FirebaseDatabase.getInstance().getReference().child("Users").child(current_user_id);
+            DatabaseReference category = FirebaseDatabase.getInstance().getReference().child("Categories").child(one_category);
+            category.child(story_key).setValue("True");
+        }
+
+        turnVisibilityOff();
 
     }
 
@@ -152,7 +205,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
-            String URL = "https://44cd5543.ngrok.io/story_share/";
+            String URL = "https://71a5b0db.ngrok.io/story_share/";
+            //https://74556a93.ngrok.io
+            //https://71a5b0db.ngrok.io
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
             jsonBody.put("story_body", all_contents);
@@ -161,19 +216,28 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Toast.makeText(getContext(), response, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "200", Toast.LENGTH_LONG).show();
                     String summary = parseSummaryFromResponse(response);
+                    String emotions_extracted = parseEmotionsFromResponse(response);
+                    String categories_extracted = parseCategoriesFromResponse(response);
+
+                    saveCategoriesExtracted(categories_extracted);
+
+                    String display_text = "The story will be added to categories: "+ categories_extracted;
+                    categories_extracted_textview.setText(display_text);
+
+                    emotions_textview.setText(emotions_extracted.toString());
                     summary_textview.setText(summary);
-                    summary_textview.setVisibility(View.VISIBLE);
-                    summary_textview.setMovementMethod(new ScrollingMovementMethod());
-                    textview_summary_tag.setVisibility(View.VISIBLE);
+                    turnVisibilityOn();
                     DatabaseReference db_stories_ref = FirebaseDatabase.getInstance().getReference().child("Stories").push();
-                    String story_key = db_stories_ref.getKey();
+                    story_key = db_stories_ref.getKey();
                     Map story_details = new HashMap();
                     String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     story_details.put("user_id", current_user_id);
                     story_details.put("whole_story", all_contents);
-                    story_details.put("story_summary", response.toString());
+                    story_details.put("story_summary", summary);
+                    story_details.put("emotional_scores", emotions_extracted);
+                    story_details.put("categories_extracted", categories_extracted);
                     DatabaseReference this_story_ref = FirebaseDatabase.getInstance().getReference().child("Stories").child(story_key);
                     this_story_ref.updateChildren(story_details);
 
@@ -219,16 +283,44 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    private void saveCategoriesExtracted(String categories_extracted) {
+        String [] items = categories_extracted.split("\\s*,\\s*");
+        categories_extracted_arraylist = Arrays.asList(items);
+        System.out.println("Inside saveCategoriesExtracted : "+ categories_extracted_arraylist.toString());
+    }
+
+    private String parseCategoriesFromResponse(String response) {
+        String categories = new String("categories_and_sentiments");
+        int outer_categories = response.indexOf(categories);
+        int inner_categories = response.indexOf("categories", outer_categories+10);
+        int end_index = response.indexOf("]", inner_categories+5);
+        String required = response.substring(inner_categories+14, end_index);
+        System.out.println("ADDED TO CATEGORIES: ");
+        System.out.println(required);
+
+        return required;
+    }
+
+    private String parseEmotionsFromResponse(String response) {
+        String computed_sentiments = new String("computed_sentiments");
+        String ending_threequotes = new String("}}}");
+        int index_start = response.indexOf(computed_sentiments);
+        int end_index = response.indexOf(ending_threequotes, index_start+10);
+        String required = response.substring(index_start+35, end_index);
+        required = required.replace(",",",\n");
+        System.out.println("Emotions parsed string is: ");
+        System.out.println(required);
+
+        return required;
+    }
+
     private String parseSummaryFromResponse(String response) {
 
         String summary = new String("summary");
         int index_start = response.indexOf(summary);
-        int end_index = response.indexOf('"',index_start+11);
+        int end_index = response.indexOf("}",index_start+11);
 
         String required = response.substring(index_start+11, end_index);
-        //System.out.println("PARSED SUMMARY IS: ");
-        //System.out.println(required);
-
         return required;
     }
 }
