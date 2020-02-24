@@ -28,6 +28,8 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 import org.json.JSONException;
@@ -41,7 +43,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -49,6 +53,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private View current;
     private TextView summary_textview;
+    private TextView textview_summary_tag;
 
     @Nullable
     @Override
@@ -58,6 +63,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         Button upload_button = current.findViewById(R.id.upload_button);
         summary_textview = current.findViewById(R.id.summary_textview);
         summary_textview.setVisibility(View.INVISIBLE);
+        textview_summary_tag = current.findViewById(R.id.textview_summary_tag);
+        textview_summary_tag.setVisibility(View.INVISIBLE);
 
         upload_button.setOnClickListener(this);
 
@@ -85,7 +92,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         final File[] all_files = new File(saved_stories_dir).listFiles();
         List<String> text_files = new ArrayList<String>();
 
-//        if (!(all_files.length == 0)){
 
             for (File onefile: all_files){
                 String file_name = onefile.getName();
@@ -107,8 +113,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 String filename_withpath = saved_stories_dir + "/" + selected_file;
 
                 String all_contents = readFileContents(filename_withpath);
-
-                //System.out.println("ALL FILE CONTENTS ARE: "+ all_contents);
 
                 try {
                     sendDjangoRequest(all_contents);
@@ -142,12 +146,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         return "";
     }
 
-    private void sendDjangoRequest(String all_contents) throws JSONException {
+    private void sendDjangoRequest(final String all_contents) throws JSONException {
 
 
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
-            String URL = "https://1ddfb449.ngrok.io/story_share/";
+
+            String URL = "https://44cd5543.ngrok.io/story_share/";
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
             jsonBody.put("story_body", all_contents);
@@ -156,10 +161,22 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Toast.makeText(getContext(), "200", Toast.LENGTH_LONG).show();
-                    summary_textview.setText(response.toString());
+                    Toast.makeText(getContext(), response, Toast.LENGTH_LONG).show();
+                    String summary = parseSummaryFromResponse(response);
+                    summary_textview.setText(summary);
                     summary_textview.setVisibility(View.VISIBLE);
                     summary_textview.setMovementMethod(new ScrollingMovementMethod());
+                    textview_summary_tag.setVisibility(View.VISIBLE);
+                    DatabaseReference db_stories_ref = FirebaseDatabase.getInstance().getReference().child("Stories").push();
+                    String story_key = db_stories_ref.getKey();
+                    Map story_details = new HashMap();
+                    String current_user_id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    story_details.put("user_id", current_user_id);
+                    story_details.put("whole_story", all_contents);
+                    story_details.put("story_summary", response.toString());
+                    DatabaseReference this_story_ref = FirebaseDatabase.getInstance().getReference().child("Stories").child(story_key);
+                    this_story_ref.updateChildren(story_details);
+
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -187,9 +204,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     String responseString = "";
                     if (response != null) {
                         responseString = String.valueOf(response.statusCode);
-                        System.out.println("NETWORKRESPONSE IS: "+ new String(response.data));
-                        System.out.println("OTHER DATA IS: "+ response.toString());
-                        // can get more details such as response.headers
+
                     }
                     return Response.success(new String(response.data), HttpHeaderParser.parseCacheHeaders(response));
                 }
@@ -202,5 +217,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
 
+    }
+
+    private String parseSummaryFromResponse(String response) {
+
+        String summary = new String("summary");
+        int index_start = response.indexOf(summary);
+        int end_index = response.indexOf('"',index_start+11);
+
+        String required = response.substring(index_start+11, end_index);
+        //System.out.println("PARSED SUMMARY IS: ");
+        //System.out.println(required);
+
+        return required;
     }
 }

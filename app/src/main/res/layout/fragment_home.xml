@@ -23,14 +23,31 @@
 
     <TextView
         android:id="@+id/summary_textview"
-        android:scrollbars="vertical"
         android:layout_width="289dp"
-        android:layout_height="237dp"
+        android:layout_height="163dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
+        android:scrollbars="vertical"
         android:text="."
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.506"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_summary_tag" />
+
+    <TextView
+        android:id="@+id/textview_summary_tag"
+        android:layout_width="89dp"
+        android:layout_height="31dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="Summary:"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.143"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/upload_button" />
+
 </android.support.constraint.ConstraintLayout>
