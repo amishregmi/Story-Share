@@ -125,8 +125,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private void saveToExtractedCategories() {
         System.out.println("Inside saveToExtractedCategories Function");
         for (String one_category : categories_extracted_arraylist){
+            String category_without_quotes = one_category.replace("\"","");
             //DatabaseReference user_db_reference = FirebaseDatabase.getInstance().getReference().child("Users").child(current_user_id);
-            DatabaseReference category = FirebaseDatabase.getInstance().getReference().child("Categories").child(one_category);
+            DatabaseReference category = FirebaseDatabase.getInstance().getReference().child("Categories").child(category_without_quotes);
+            System.out.println("ONE_CATEGORY IS: "+ one_category);
             category.child(story_key).setValue("True");
         }
 
@@ -205,9 +207,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
-            String URL = "https://71a5b0db.ngrok.io/story_share/";
-            //https://74556a93.ngrok.io
-            //https://71a5b0db.ngrok.io
+            String URL = "https://0c730d1f.ngrok.io/story_share/";
+            //https://0c730d1f.ngrok.io
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
             jsonBody.put("story_body", all_contents);

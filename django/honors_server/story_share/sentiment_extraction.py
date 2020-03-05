@@ -16,6 +16,3 @@ def sentiment_extraction_function(summary):
 	response_from_module['computed_sentiments'] = response
 	
 	return response_from_module
-	#{'categories':['Angry','Fear', 'Sad'],
-	#'computed_sentiments': {'emotion': {'Happy: 0.15', 'Angry': 0.something}}
-	#}
