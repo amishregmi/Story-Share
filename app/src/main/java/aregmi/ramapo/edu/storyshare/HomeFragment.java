@@ -207,8 +207,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
-            String URL = "https://0c730d1f.ngrok.io/story_share/";
-            //https://0c730d1f.ngrok.io
+            String URL = "https://9f6349a5.ngrok.io/story_share/";
+            //http://9f6349a5.ngrok.io
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
             jsonBody.put("story_body", all_contents);

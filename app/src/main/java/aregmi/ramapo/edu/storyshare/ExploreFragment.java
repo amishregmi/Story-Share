@@ -40,6 +40,7 @@ public class ExploreFragment extends Fragment{
 
                 Intent intent = new Intent(getActivity(), SelectedCategoryOptions.class);
                 intent.putExtra("selected_category", selected_category);
+                System.out.println("Selected category is: "+ selected_category);
                 startActivity(intent);
 
             }
