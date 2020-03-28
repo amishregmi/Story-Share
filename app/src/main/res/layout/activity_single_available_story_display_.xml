@@ -11,8 +11,8 @@
         android:layout_height="wrap_content"
         android:paddingLeft="20dp"
         android:textColor="#3399FF"
-        android:paddingBottom="5dp"
-        android:textSize="15sp"
+        android:paddingBottom="10dp"
+        android:textSize="30sp"
         />
 
     <TextView
@@ -22,7 +22,7 @@
         android:layout_below="@+id/author_name"
         android:paddingLeft="20dp"
         android:textColor="#3399FF"
-        android:paddingBottom="5dp"
+        android:paddingBottom="20dp"
         android:textSize="15sp" />
 
 

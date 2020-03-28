@@ -63,6 +63,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private Button save_button;
     private List<String> categories_extracted_arraylist;
     private String story_key;
+    private String story_title = "";
 
 
     @Nullable
@@ -142,22 +143,23 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         load_file.setTitle("Select Story");
 
         final String saved_stories_dir = Environment.getExternalStorageDirectory().getAbsolutePath()+"/saved_stories";
+        //final String saved_stories_dir = Environment.getExternalStorageDirectory().getAbsolutePath();
         System.out.println("SAVED STORIES DIR IS: "+ saved_stories_dir);
 
         final File[] all_files = new File(saved_stories_dir).listFiles();
         List<String> text_files = new ArrayList<String>();
 
 
-            for (File onefile: all_files){
-                String file_name = onefile.getName();
-                if (file_name.endsWith(".txt")){
-                    text_files.add(file_name);
-                }
+        for (File onefile: all_files){
+            String file_name = onefile.getName();
+            if (file_name.endsWith(".txt")){
+                text_files.add(file_name);
             }
+        }
 
-            int size = text_files.size();
-            String[] options = new String[size];
-            options = text_files.toArray(options);
+        int size = text_files.size();
+        String[] options = new String[size];
+        options = text_files.toArray(options);
 
         AlertDialog.Builder builder = load_file.setItems(options, new DialogInterface.OnClickListener() {
             @Override
@@ -165,6 +167,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 ListView options = ((AlertDialog) dialog).getListView();
                 String selected_file = (String) options.getAdapter().getItem(which);
                 System.out.println("Selected file is: " + selected_file);
+                story_title = selected_file;
                 String filename_withpath = saved_stories_dir + "/" + selected_file;
 
                 String all_contents = readFileContents(filename_withpath);
@@ -207,8 +210,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
-            String URL = "https://9f6349a5.ngrok.io/story_share/";
-            //http://9f6349a5.ngrok.io
+            String URL = "https://6b648249.ngrok.io/story_share/";
+            // https://6b648249.ngrok.io
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
             jsonBody.put("story_body", all_contents);
@@ -239,6 +242,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     story_details.put("story_summary", summary);
                     story_details.put("emotional_scores", emotions_extracted);
                     story_details.put("categories_extracted", categories_extracted);
+                    String title_without_txt = story_title.replace(".txt","");
+                    story_details.put("story_title", title_without_txt);
                     DatabaseReference this_story_ref = FirebaseDatabase.getInstance().getReference().child("Stories").child(story_key);
                     this_story_ref.updateChildren(story_details);
 
