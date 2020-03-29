@@ -23,7 +23,9 @@
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_home" />
-        <activity android:name=".SelectedCategoryOptions"></activity>
+        <activity android:name=".SelectedCategoryOptions" />
+        <activity android:name=".SelectedStorySummary" />
+        <activity android:name=".FullStoryActivity"></activity>
     </application>
 
 </manifest>

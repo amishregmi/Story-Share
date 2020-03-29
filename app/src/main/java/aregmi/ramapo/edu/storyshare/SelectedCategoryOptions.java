@@ -1,6 +1,7 @@
 package aregmi.ramapo.edu.storyshare;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -161,8 +162,13 @@ public class SelectedCategoryOptions extends Activity implements AdapterView.OnI
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String row_info = listView.getItemAtPosition(position).toString();
-        Toast.makeText(getApplicationContext(), row_info,
+
+        Toast.makeText(getApplicationContext(), "Position is: "+position,
                 Toast.LENGTH_LONG).show();
+
+        String story_id = story_ids.get(position);
+        Intent intent = new Intent(SelectedCategoryOptions.this, SelectedStorySummary.class);
+        intent.putExtra("story_id", story_id);
+        startActivity(intent);
     }
 }

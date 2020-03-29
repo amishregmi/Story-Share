@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -35,15 +34,10 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,11 +66,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         story_key = "";
         current = inflater.inflate(R.layout.fragment_home, container, false);
         Button upload_button = current.findViewById(R.id.upload_button);
-        summary_textview = current.findViewById(R.id.summary_textview);
-        textview_summary_tag = current.findViewById(R.id.textview_summary_tag);
-        extracted_emotions_textview = current.findViewById(R.id.extracted_emotions_textview);
-        emotions_textview = current.findViewById(R.id.emotions_textview);
-        categories_extracted_textview = current.findViewById(R.id.categories_extracted_textview);
+        summary_textview = current.findViewById(R.id.summary_textvieww);
+        textview_summary_tag = current.findViewById(R.id.textview_summary_tagg);
+        extracted_emotions_textview = current.findViewById(R.id.extracted_emotions_textvieww);
+        emotions_textview = current.findViewById(R.id.emotions_textvieww);
+        categories_extracted_textview = current.findViewById(R.id.belonging_categories);
         save_button = current.findViewById(R.id.save_button);
         //categories_extracted_arraylist.clear();
 
