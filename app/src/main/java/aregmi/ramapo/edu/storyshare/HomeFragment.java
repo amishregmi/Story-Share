@@ -200,12 +200,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     private void sendDjangoRequest(final String all_contents) throws JSONException {
 
+        System.out.println("MAKING REQUEST TO SERVER");
 
         try {
             RequestQueue requestQueue = Volley.newRequestQueue(getContext());
 
-            String URL = "https://6b648249.ngrok.io/story_share/";
-            // https://6b648249.ngrok.io
+            String URL = "https://00625f77.ngrok.io/story_share/";
+            //https://00625f77.ngrok.io
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("user_id", FirebaseAuth.getInstance().getCurrentUser().getUid());
             jsonBody.put("story_body", all_contents);

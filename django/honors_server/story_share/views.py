@@ -17,16 +17,17 @@ def index(request):
 	user_id = body['user_id']
 	whole_story = body['story_body']
 	computed_summary = text_summarization_function(str(whole_story))
+	print("summary computed")
 	#print("The computed summary is: ")
 	#print(computed_summary)
-	array_of_keywords = keyword_extraction_function(str(computed_summary))
+	#array_of_keywords = keyword_extraction_function(str(computed_summary))
 	categories_and_sentiments = sentiment_extraction_function(str(computed_summary))
 	#json_response['extracted_tags'] = array_of_keywords
 	json_response['categories_and_sentiments'] = categories_and_sentiments
 	json_response['summary'] = computed_summary
 
-	print("THE JSON RESPONSE IS: ")
-	print(json_response)
+	#print("THE JSON RESPONSE IS: ")
+	#print(json_response)
 
 	#return HttpResponse(str(computed_summary))
 	return JsonResponse(json_response)
